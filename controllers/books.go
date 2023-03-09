@@ -73,7 +73,10 @@ func UpdateBook(ctx *gin.Context) {
 
 	// update the book's information in database
 	// walkaround to data update error
-	if input.Title != "" {
+	if input.Title != "" && input.Author != "" {
+		updateBook := models.Book{Author: input.Author, Title: input.Title}
+		models.DB.Model(&book).Updates(&updateBook)
+	}else if input.Title != "" {
 		updateBook := models.Book{Title: input.Title}
 		models.DB.Model(&book).Updates(&updateBook)
 	} else if input.Author != "" {
@@ -82,4 +85,19 @@ func UpdateBook(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"data": book})
+}
+
+// Delete a book
+func DeleteBook(ctx *gin.Context) {
+	// get the model if exists
+	var book models.Book
+
+	if err := models.DB.Where("id = ?", ctx.Param("id")).First(&book).Error; err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Record not found!"})
+		return
+	}
+
+	models.DB.Delete(&book)
+
+	ctx.JSON(http.StatusOK, gin.H{"data": true})
 }
