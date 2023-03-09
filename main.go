@@ -1,16 +1,19 @@
 package main
 
 import (
-	"net/http"
+	"github.com/Ckm54/bookstore-go/models"
+	"github.com/Ckm54/bookstore-go/controllers"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	r := gin.Default()
 
-	r.GET("/", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, gin.H{"data": "Hello there"})
-	})
+	models.ConnectDatabase()
+
+	r.GET("/books", controllers.FindBooks)
+	r.POST("/books", controllers.CreateBook)
+	r.GET("/books/:id", controllers.FindBook)
 
 	r.Run()
 }
